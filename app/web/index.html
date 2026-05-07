@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Mini Kanban</title>
+<style>
+  body { font-family: -apple-system, system-ui, sans-serif; margin: 0; padding: 1rem; background: #f6f7f9; color: #222; }
+  header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1rem; }
+  header h1 { margin: 0; font-size: 1.2rem; }
+  header .stats { display: flex; gap: .75rem; font-size: .85rem; color: #555; }
+  .board { display: grid; grid-template-columns: repeat(4, 1fr); gap: .75rem; }
+  .col { background: #fff; border-radius: 8px; padding: .5rem; min-height: 70vh; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  .col h2 { font-size: .9rem; margin: .25rem .25rem .5rem; display: flex; justify-content: space-between; }
+  .col[data-status="pending"] h2 { color: #555; }
+  .col[data-status="running"] h2 { color: #1769ff; }
+  .col[data-status="success"] h2 { color: #1a7f37; }
+  .col[data-status="failed"] h2 { color: #b42318; }
+  .card { background: #fafbfc; border: 1px solid #e1e4e8; border-radius: 6px; padding: .5rem; margin-bottom: .4rem; font-size: .8rem; }
+  .card .row { display: flex; justify-content: space-between; gap: .5rem; }
+  .card .id { font-weight: 600; }
+  .card .type { color: #555; }
+  .card .meta { color: #777; font-size: .72rem; margin-top: .2rem; }
+  .empty { color: #aaa; font-size: .8rem; padding: .5rem; text-align: center; }
+  footer { margin-top: 1rem; font-size: .75rem; color: #888; text-align: center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Mini Kanban</h1>
+  <div class="stats" id="stats"></div>
+</header>
+<div class="board" id="board">
+  <div class="col" data-status="pending"><h2>Pending <span id="cnt-pending">0</span></h2><div class="list" id="list-pending"></div></div>
+  <div class="col" data-status="running"><h2>Running <span id="cnt-running">0</span></h2><div class="list" id="list-running"></div></div>
+  <div class="col" data-status="success"><h2>Success <span id="cnt-success">0</span></h2><div class="list" id="list-success"></div></div>
+  <div class="col" data-status="failed"><h2>Failed <span id="cnt-failed">0</span></h2><div class="list" id="list-failed"></div></div>
+</div>
+<footer>auto-refresh every 3s</footer>
+<script>
+async function fetchJson(url) {
+  const r = await fetch(url);
+  if (r.status === 204) return null;
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+function fmtAge(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const s = Math.max(0, (Date.now() - d.getTime()) / 1000);
+  if (s < 60) return Math.floor(s) + 's';
+  if (s < 3600) return Math.floor(s/60) + 'm';
+  if (s < 86400) return Math.floor(s/3600) + 'h';
+  return Math.floor(s/86400) + 'd';
+}
+function card(t) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.innerHTML = `
+    <div class="row"><span class="id">#${t.id}</span><span class="type">${t.type}</span></div>
+    <div class="meta">prio ${t.priority} · attempt ${t.attempts}/${t.max_attempts}${t.worker_id ? ' · ' + t.worker_id : ''} · ${fmtAge(t.updated_at)} ago</div>
+  `;
+  return el;
+}
+async function refresh() {
+  try {
+    const stats = await fetchJson('/stats');
+    for (const k of ['pending','running','success','failed']) {
+      document.getElementById('cnt-' + k).textContent = stats[k] ?? 0;
+    }
+    for (const k of ['pending','running','success','failed']) {
+      const data = await fetchJson('/tasks?status=' + k + '&limit=20');
+      const list = document.getElementById('list-' + k);
+      list.innerHTML = '';
+      if (!data.items.length) {
+        const e = document.createElement('div');
+        e.className = 'empty';
+        e.textContent = '—';
+        list.appendChild(e);
+      } else {
+        for (const t of data.items) list.appendChild(card(t));
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+refresh();
+setInterval(refresh, 3000);
+</script>
+</body>
+</html>
