@@ -10,9 +10,9 @@ def test_concurrent_claims_each_task_claimed_once(tmp_path):
     n_tasks = 50
     n_workers = 10
     for i in range(n_tasks):
-        repo.enqueue("t", {"i": i})
+        repo.create_task(f"task {i}", type="t", payload={"i": i})
 
-    claimed_ids: list[int] = []
+    claimed_ids: list[str] = []
     lock = threading.Lock()
 
     def worker(name: str):

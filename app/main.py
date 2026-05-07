@@ -1,4 +1,7 @@
+"""ASGI entrypoint. `python -m app.main` (or `kanban` after install) runs uvicorn."""
+
 import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -15,9 +18,7 @@ def create_app(repo=None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         app.state.repo = repo
-        task = asyncio.create_task(
-            run_sweeper(repo, settings.sweep_interval_seconds)
-        )
+        task = asyncio.create_task(run_sweeper(repo, settings.sweep_interval_seconds))
         try:
             yield
         finally:
@@ -27,7 +28,12 @@ def create_app(repo=None) -> FastAPI:
             except asyncio.CancelledError:
                 pass
 
-    app = FastAPI(title="Mini Kanban", lifespan=lifespan)
+    app = FastAPI(
+        title="Kanban Core",
+        description="Headless kanban task graph for agent workers.",
+        version="0.1.0",
+        lifespan=lifespan,
+    )
     app.include_router(router)
     return app
 
@@ -38,6 +44,10 @@ app = create_app()
 def main() -> None:
     import uvicorn
 
+    logging.basicConfig(
+        level=settings.log_level,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
     uvicorn.run(
         "app.main:app",
         host=settings.http_host,

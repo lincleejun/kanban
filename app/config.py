@@ -1,3 +1,7 @@
+"""Environment-driven configuration.
+
+Override any field with an env var of the same uppercase name."""
+
 import os
 from dataclasses import dataclass
 
@@ -9,6 +13,7 @@ class Settings:
     sweep_interval_seconds: int = int(os.environ.get("SWEEP_INTERVAL_SECONDS", "10"))
     http_host: str = os.environ.get("HTTP_HOST", "127.0.0.1")
     http_port: int = int(os.environ.get("HTTP_PORT", "8000"))
+    log_level: str = os.environ.get("LOG_LEVEL", "INFO")
 
 
 settings = Settings()
