@@ -68,6 +68,17 @@ def test_task_add_with_payload_json(cli_runner):
     assert data["priority"] == 5
 
 
+def test_task_ls_prints_header_with_column_names(cli_runner):
+    run(cli_runner, "task", "add", "headed", "--type", "x", "--key", "h1")
+    r = run(cli_runner, "task", "ls")
+    assert r.exit_code == 0, r.output
+    lines = r.output.splitlines()
+    # First non-empty line is the header.
+    header = next(l for l in lines if l.strip())
+    for col in ("ID", "STATUS", "TYPE", "TITLE"):
+        assert col in header, f"missing {col} in header: {header!r}"
+
+
 def test_task_ls_paginates_with_limit_and_offset(cli_runner):
     for i in range(7):
         r = run(cli_runner, "task", "add", f"t{i}", "--type", "x", "--key", f"k{i}")

@@ -135,9 +135,12 @@ def task_ls(
         typer.echo(jsonlib.dumps({"items": items, "total": total}, indent=2))
         return
 
+    if items:
+        # Match the row format exactly so columns align under the header.
+        typer.echo(f"{'ID':<22}  {'STATUS':<8}  {'TYPE':<12}  TITLE")
     for t in items:
         typer.echo(
-            f"{t['id']}  {t['status']:<8}  {t.get('type') or '-':<12}  {t.get('title') or ''}"
+            f"{t['id']:<22}  {t['status']:<8}  {(t.get('type') or '-'):<12}  {t.get('title') or ''}"
         )
 
     if all_:
