@@ -12,7 +12,7 @@ state propagation.
 
 Run the server first:
 
-    python -m app.main
+    kanban serve   # or: python -m kanban_core.server
     python examples/03_dependencies.py
 """
 

@@ -1,4 +1,4 @@
-"""ASGI entrypoint. `python -m app.main` (or `kanban` after install) runs uvicorn."""
+"""ASGI entrypoint. `python -m kanban_core.server` (or `kanban serve`) runs uvicorn."""
 
 import asyncio
 import logging
@@ -49,7 +49,7 @@ def main() -> None:
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
     uvicorn.run(
-        "app.main:app",
+        "kanban_core.server:app",
         host=settings.http_host,
         port=settings.http_port,
         reload=False,

@@ -1,6 +1,6 @@
 import threading
 
-from app.sqlite_repo import SqliteTaskRepository
+from kanban_core.sqlite_repo import SqliteTaskRepository
 
 
 def test_concurrent_claims_each_task_claimed_once(tmp_path):

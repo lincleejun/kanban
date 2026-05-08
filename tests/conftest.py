@@ -1,9 +1,6 @@
-import os
-import tempfile
-
 import pytest
 
-from app.sqlite_repo import SqliteTaskRepository
+from kanban_core.sqlite_repo import SqliteTaskRepository
 
 
 @pytest.fixture
@@ -18,16 +15,16 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setenv("KANBAN_DB_PATH", str(db))
     # Re-import settings so env var takes effect.
     import importlib
-    from app import config as cfg
+    from kanban_core import config as cfg
 
     importlib.reload(cfg)
-    from app import api as api_mod
-    from app import main as main_mod
+    from kanban_core import api as api_mod
+    from kanban_core import server as server_mod
 
     importlib.reload(api_mod)
-    importlib.reload(main_mod)
+    importlib.reload(server_mod)
 
     from fastapi.testclient import TestClient
 
-    with TestClient(main_mod.app) as c:
+    with TestClient(server_mod.app) as c:
         yield c

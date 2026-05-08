@@ -6,7 +6,7 @@ lease will expire and the sweeper requeues the task.
 
 Run the server first:
 
-    python -m app.main
+    kanban serve   # or: python -m kanban_core.server
 
 Seed a few tasks (e.g. via examples/01_quickstart.py or curl), then:
 

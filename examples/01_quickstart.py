@@ -2,7 +2,7 @@
 
 Run the server first:
 
-    python -m app.main
+    kanban serve   # or: python -m kanban_core.server
 
 Then in another terminal:
 

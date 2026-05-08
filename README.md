@@ -35,11 +35,36 @@ gets retried — without bringing in Redis, Postgres, or Celery.
 Requires Python 3.11+.
 
 ```bash
-pip install -e ".[dev]"
-python -m app.main          # serves on http://127.0.0.1:8000
+pip install -e ".[dev,cli]"
+kanban serve                # serves on http://127.0.0.1:8000
 ```
 
 Open http://127.0.0.1:8000/docs for the interactive OpenAPI UI.
+
+## CLI
+
+A typer-based CLI ships under the `[cli]` extra and talks to a running server:
+
+```bash
+kanban serve                                  # start the server
+kanban task add "fix login" --type bug        # create a task; prints id
+kanban task ls --status ready --limit 20      # list with pagination
+kanban task ls --all                          # iterate all pages
+kanban task show <id>                         # human-readable; --json for raw
+kanban task claim --worker me                 # atomic claim
+kanban task done <id> --worker me --result '{"ok":true}'
+kanban task fail <id> --worker me --error "boom"
+kanban link <parent_id> <child_id>            # add dependency
+kanban stats                                  # counts by status
+```
+
+Pagination flags on `kanban task ls`:
+
+- `--limit N` (default 50, max 500), `--offset N` — direct passthrough to the API
+- `--all` — auto-iterate every page (use with care on large datasets)
+- footer shows `Showing 1-50 of 137 (use --offset 50 for next page)`
+
+The CLI honours `KANBAN_URL` for non-default servers (default `http://127.0.0.1:8000`).
 
 ## Concepts
 
@@ -138,7 +163,7 @@ rules, lease recovery, and how to attach Codex / Claude Code workers.
 ## Testing
 
 ```bash
-pip install -e ".[dev]"
+pip install -e ".[dev,cli]"
 pytest
 ```
 

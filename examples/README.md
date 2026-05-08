@@ -4,7 +4,7 @@ Runnable demos for Kanban Core. Start the server first:
 
 ```bash
 pip install -e ".[dev]" httpx
-python -m app.main          # serves on http://127.0.0.1:8000
+kanban serve                # serves on http://127.0.0.1:8000
 ```
 
 Then in another terminal:
