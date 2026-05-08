@@ -1,11 +1,6 @@
 """Kanban CLI — HTTP client for the Kanban Core API.
 
-Install with the [cli] extra:
-
-    pip install "kanban-core[cli]"
-
-Then:
-
+    pip install kanban-core
     kanban serve
     kanban task add "fix login" --type bug
     kanban task ls --status ready --limit 20

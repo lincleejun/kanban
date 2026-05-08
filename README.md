@@ -35,7 +35,7 @@ gets retried — without bringing in Redis, Postgres, or Celery.
 Requires Python 3.11+.
 
 ```bash
-pip install -e ".[dev,cli]"
+pip install -e ".[dev]"
 kanban serve                # serves on http://127.0.0.1:8000
 ```
 
@@ -43,7 +43,7 @@ Open http://127.0.0.1:8000/docs for the interactive OpenAPI UI.
 
 ## CLI
 
-A typer-based CLI ships under the `[cli]` extra and talks to a running server:
+A typer-based CLI ships with the package and talks to a running server:
 
 ```bash
 kanban serve                                  # start the server
@@ -163,7 +163,7 @@ rules, lease recovery, and how to attach Codex / Claude Code workers.
 ## Testing
 
 ```bash
-pip install -e ".[dev,cli]"
+pip install -e ".[dev]"
 pytest
 ```
 
