@@ -60,7 +60,7 @@ def serve() -> None:
 @task_app.command("add")
 def task_add(
     title: str = typer.Argument(..., help="Task title."),
-    type: str | None = typer.Option(None, "--type", help="Task type."),
+    type: str = typer.Option(..., "--type", help="Task type (required)."),
     body: str = typer.Option("", "--body", help="Task body / description."),
     assignee: str | None = typer.Option(None, "--assignee"),
     priority: int = typer.Option(0, "--priority"),
@@ -69,6 +69,9 @@ def task_add(
     key: str | None = typer.Option(None, "--key", help="Idempotency key."),
 ) -> None:
     """Create a task. Prints the new task id."""
+    if not type.strip():
+        typer.echo("error: --type must not be empty", err=True)
+        raise typer.Exit(2)
     try:
         payload_obj = jsonlib.loads(payload)
     except jsonlib.JSONDecodeError as exc:
@@ -77,13 +80,12 @@ def task_add(
 
     body_req: dict[str, Any] = {
         "title": title,
+        "type": type,
         "body": body,
         "priority": priority,
         "payload": payload_obj,
         "parents": parents,
     }
-    if type is not None:
-        body_req["type"] = type
     if assignee is not None:
         body_req["assignee"] = assignee
     if key is not None:

@@ -51,6 +51,18 @@ def test_task_add_creates_task_and_prints_id(cli_runner):
     assert "task_" in r.output
 
 
+def test_task_add_requires_type(cli_runner):
+    r = run(cli_runner, "task", "add", "no type")
+    assert r.exit_code != 0
+    assert "type" in (r.output + (r.stderr or "")).lower()
+
+
+def test_task_add_rejects_empty_type(cli_runner):
+    r = run(cli_runner, "task", "add", "blank type", "--type", "  ")
+    assert r.exit_code != 0
+    assert "empty" in (r.output + (r.stderr or "")).lower()
+
+
 def test_task_add_with_payload_json(cli_runner):
     r = run(
         cli_runner,
